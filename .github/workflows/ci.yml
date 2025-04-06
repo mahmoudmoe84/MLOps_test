@@ -40,11 +40,4 @@ jobs:
       # Test the model
       - name: Test model
         run: |
-          python src/test.py
-
-      # Upload the model as an artifact
-      - name: Upload Model Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: model-artifact
-          path: model.pkl  
+          python src/test.py 

@@ -8,8 +8,6 @@ on:
 
 permissions:
   contents: read
-  actions: read
-  checks: write
   id-token: write
 
 jobs:
@@ -45,34 +43,15 @@ jobs:
             echo '{"test_size": 0.2, "random_state": 42, "model_type": "DecisionTree"}' > config.json
           fi
 
-      # Create artifacts directory
-      - name: Create artifacts directory
-        run: mkdir -p artifacts
-
-      # Train the model
-      - name: Train model
+      # Train and test the model
+      - name: Train and test model
         run: |
           python src/train.py
-          cp model.pkl artifacts/
-
-      # Test the model
-      - name: Test model
-        run: |
           python src/test.py
 
-      # Download previous artifact if exists
-      - name: Download previous artifact
-        uses: actions/download-artifact@v3
-        continue-on-error: true
-        with:
-          name: trained-model
-          path: previous-artifacts
-
-      # Store model artifact
-      - name: Upload model artifact
+      # Upload the model as an artifact
+      - name: Upload Model Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: trained-model
-          path: artifacts/model.pkl
-          retention-days: 5
-          if-no-files-found: error  
+          name: model-artifact
+          path: model.pkl  

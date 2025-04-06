@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: ["main"]
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -39,10 +43,15 @@ jobs:
             echo '{"test_size": 0.2, "random_state": 42, "model_type": "DecisionTree"}' > config.json
           fi
 
+      # Create artifacts directory
+      - name: Create artifacts directory
+        run: mkdir -p artifacts
+
       # Train the model
       - name: Train model
         run: |
           python src/train.py
+          cp model.pkl artifacts/
 
       # Test the model
       - name: Test model
@@ -51,7 +60,9 @@ jobs:
 
       # Store model artifact
       - name: Upload model artifact
+        if: success()
         uses: actions/upload-artifact@v3
         with:
           name: trained-model
-          path: model.pkl  
+          path: artifacts/model.pkl
+          retention-days: 5  

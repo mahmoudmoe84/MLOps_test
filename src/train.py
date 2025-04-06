@@ -11,7 +11,11 @@ from sklearn.model_selection import train_test_split
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s'
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler('train.log'),
+        logging.StreamHandler()
+    ]
 )
 
 log = logging.getLogger(__name__)

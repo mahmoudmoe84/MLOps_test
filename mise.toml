@@ -1,0 +1,27 @@
+#mise.toml for MLOps Project
+
+[env]
+
+#automatically make virtual enviroment inside the python project
+_.python.venv ={path ="{{config_root}}/.venv",create =true}
+
+#use kubeconfig
+KUBECONFIG ="{{config_root}}/kubeconfig"
+
+[tools]
+
+python ="3.10"
+# CLI tools
+"aqua:kubernetes/kubectl" = "1.27.3"
+"aqua:kubernetes-sigs/kustomize" = "5.6.0"
+"aqua:helm/helm" = "3.11.2"
+"aqua:derailed/k9s" = "0.40.10"
+
+#downloading YAML / JSON
+"aqua:mikefarah/yq" = "4.45.1"
+"aqua:jqlang/jq" = "1.7.1"
+
+#github CLI 
+"aqua:cli/cli" = "2.39.0"
+
+

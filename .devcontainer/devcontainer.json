@@ -1,0 +1,30 @@
+{
+  "name": "my-mlops-dev",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "features": {
+    "ghcr.io/devcontainers-extra/features/mise:1": {}
+  },
+
+  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": ".venv/bin/python"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "charliermarsh.ruff"
+      ]
+    }
+  },
+  
+  "forwardPorts": [8888],
+  "appPort": ["8888:8888"],
+  "remoteUser": "vscode",
+  "shutdownAction": "stopContainer"
+}

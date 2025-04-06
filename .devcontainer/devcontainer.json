@@ -26,5 +26,9 @@
   "forwardPorts": [8888],
   "appPort": ["8888:8888"],
   "remoteUser": "vscode",
-  "shutdownAction": "stopContainer"
+  "shutdownAction": "stopContainer",
+  
+  "mounts": [
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+  ]
 }

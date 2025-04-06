@@ -6,28 +6,17 @@ on:
   pull_request:
     branches: ["main"]
 
-permissions:
-  contents: read
-  id-token: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    
     steps:
       # Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       # Setup Python environment
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
-          cache: 'pip'
 
       # Install project dependencies
       - name: Install dependencies
@@ -43,10 +32,14 @@ jobs:
             echo '{"test_size": 0.2, "random_state": 42, "model_type": "DecisionTree"}' > config.json
           fi
 
-      # Train and test the model
-      - name: Train and test model
+      # Train the model
+      - name: Train model
         run: |
           python src/train.py
+
+      # Test the model
+      - name: Test model
+        run: |
           python src/test.py
 
       # Upload the model as an artifact

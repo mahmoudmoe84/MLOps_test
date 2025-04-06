@@ -8,7 +8,9 @@ on:
 
 permissions:
   contents: read
-  actions: write
+  actions: read
+  checks: write
+  id-token: write
 
 jobs:
   build:
@@ -58,11 +60,19 @@ jobs:
         run: |
           python src/test.py
 
+      # Download previous artifact if exists
+      - name: Download previous artifact
+        uses: actions/download-artifact@v3
+        continue-on-error: true
+        with:
+          name: trained-model
+          path: previous-artifacts
+
       # Store model artifact
       - name: Upload model artifact
-        if: success()
         uses: actions/upload-artifact@v3
         with:
           name: trained-model
           path: artifacts/model.pkl
-          retention-days: 5  
+          retention-days: 5
+          if-no-files-found: error  

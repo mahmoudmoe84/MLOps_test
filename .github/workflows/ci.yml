@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: ["main"]
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,9 +39,31 @@ jobs:
       # Train the model
       - name: Train model
         run: |
-          python src/train.py
+          python src/train.py 2>&1 | tee training.log
 
       # Test the model
       - name: Test model
         run: |
-          python src/test.py 
+          python src/test.py 2>&1 | tee test.log
+
+      # Upload artifacts
+      - name: Upload Training Log
+        uses: actions/upload-artifact@v3
+        with:
+          name: training-log
+          path: training.log
+          retention-days: 5
+      
+      - name: Upload Test Log
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-log
+          path: test.log
+          retention-days: 5
+      
+      - name: Upload Model
+        uses: actions/upload-artifact@v3
+        with:
+          name: trained-model
+          path: model.pkl
+          retention-days: 5

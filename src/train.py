@@ -4,6 +4,7 @@ import pandas as pd
 import logging
 import json 
 import pickle
+import os
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
@@ -14,39 +15,64 @@ logging.basicConfig(
 )
 
 log = logging.getLogger(__name__)
-log.info('start training')
 
-with open('config.json') as f:
-    config = json.load(f)
-    
-log.info(f"config : {config}")
+def main():
+    log.info('Starting training pipeline')
 
+    # Load configuration
+    try:
+        with open('config.json') as f:
+            config = json.load(f)
+        log.info(f"Loaded config: {config}")
+    except FileNotFoundError:
+        log.warning("config.json not found, using default configuration")
+        config = {
+            "test_size": 0.2,
+            "random_state": 42,
+            "model_type": "DecisionTree"
+        }
+    except json.JSONDecodeError:
+        log.error("Invalid JSON in config.json")
+        raise
 
-iris = load_iris()
-X = iris.data
-y = iris.target
-log.info(f'Data shape: {X.shape}, target: {set(y)}')
+    # Load and prepare data
+    iris = load_iris()
+    X = iris.data
+    y = iris.target
+    log.info(f'Data shape: {X.shape}, target: {set(y)}')
 
+    # Split data
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y,
+        test_size=config['test_size'],
+        random_state=config['random_state']
+    )
+    log.info('Data split into train and test sets')
 
-X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=config['test_size'],random_state=config['random_state'])
-log.info('data split into train and test')
+    # Initialize and train model
+    if config['model_type'] == 'DecisionTree':
+        model = DecisionTreeClassifier(random_state=config['random_state'])
+    else:
+        raise ValueError(f"Model type {config['model_type']} is not supported")
 
-#train the model 
-if config['model_type'] =='DecisionTree':
-    model = DecisionTreeClassifier()
-else:
-    raise ValueError('model is not supported')
+    log.info('Model initialized')
+    model.fit(X_train, y_train)
+    log.info('Model has been trained')
 
-log.info('model has been built')
-model.fit(X_train, y_train)  # Fixed: Training on training data only
-log.info('Model has been trained')
+    # Evaluate model
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    log.info(f'Model accuracy: {accuracy:.4f}')
 
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test,y_pred)
-log.info(f'model accuracy is : {accuracy:0.4f}')
+    # Save model
+    model_path = 'model.pkl'
+    try:
+        with open(model_path, 'wb') as f:
+            pickle.dump(model, f)
+        log.info(f'Model saved to {model_path}')
+    except Exception as e:
+        log.error(f'Failed to save model: {str(e)}')
+        raise
 
-# Save the trained model
-model_path = 'model.pkl'
-with open(model_path, 'wb') as f:
-    pickle.dump(model, f)
-log.info(f'Model saved to {model_path}')
+if __name__ == "__main__":
+    main()

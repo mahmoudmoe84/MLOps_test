@@ -3,6 +3,7 @@ from sklearn.tree import DecisionTreeClassifier
 import pandas as pd
 import logging
 import json 
+import pickle
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
@@ -27,22 +28,25 @@ y = iris.target
 log.info(f'Data shape: {X.shape}, target: {set(y)}')
 
 
-X_train,X_test,y_train,y_test = train_test_split(X,y,train_size=config['test_size'],random_state=config['random_state']
-                                                 )
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=config['test_size'],random_state=config['random_state'])
 log.info('data split into train and test')
-#train the model 
 
+#train the model 
 if config['model_type'] =='DecisionTree':
     model = DecisionTreeClassifier()
-    
 else:
     raise ValueError('model is not supported')
 
 log.info('model has been built')
-model.fit(X,y)
+model.fit(X_train, y_train)  # Fixed: Training on training data only
 log.info('Model has been trained')
 
 y_pred = model.predict(X_test)
-
 accuracy = accuracy_score(y_test,y_pred)
 log.info(f'model accuracy is : {accuracy:0.4f}')
+
+# Save the trained model
+model_path = 'model.pkl'
+with open(model_path, 'wb') as f:
+    pickle.dump(model, f)
+log.info(f'Model saved to {model_path}')
